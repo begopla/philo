@@ -12,51 +12,40 @@
 
 #include "philo.h"
 
-int	ft_atoi(const char *str)
+int	throw_error(int error)
 {
-	long int	n;
-	int			sign;
+	if (error == 1)
+		printf("Error: Wrong params, please enter: num_of_philo\
+		time_to_die time_to_eat time_to_sleep\
+		(num_of_must_eat)\n ");
+	else if (error == 2)
+		printf("Error: Fatal error when inititalizing mutex\n");
+	return (1);
+}
 
-	n = 0;
-	sign = 1;
-	while ((*str <= 13 && *str >= 9) || *str == 32)
-		str++;
-	if (*str == '-')
-		return (-1);
-	else if (*str == '+')
-		str++;
-	while (*str)
+void	exit_launcher(t_args *args, t_philo *philos)
+{
+	int i;
+
+	i = -1;
+	while (++i < args->num_philo)
+		pthread_join(philos[i].thread_id, NULL);
+	i = -1;
+	while (++i < args->num_philo)
+		pthread_mutex_destroy(&(args->forks[i]));
+	pthread_mutex_destroy(&(args->writing));
+}
+
+
+void		smart_sleep(long long time, t_args *args)
+{
+	long long i;
+
+	i = init_time();
+	while (!(args->died))
 	{
-		if (*str >= '0' && *str <= '9')
-			n = n * 10 + (*str++ - '0');
-		else
-			return (-1);
+		if (time_diff(i, init_time()) >= time)
+			break ;
+		usleep(50);
 	}
-	return ((int)(n * sign));
-}
-
-unsigned long	init_time(void)
-{
-	struct timeval	time;
-
-	gettimeofday(&time, NULL);
-	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
-}
-
-long long	time_diff(long long past, long long pres)
-{
-	return (pres - past);
-}
-
-void		action_print(t_args *args, int id, char *string)
-{
-	pthread_mutex_lock(&(args->writing));
-	if (!(args->died))
-	{
-		printf("%lli ", init_time() - args->first_timestamp);
-		printf("%i ", id + 1);
-		printf("%s\n", string);
-	}
-	pthread_mutex_unlock(&(args->writing));
-	return ;
 }

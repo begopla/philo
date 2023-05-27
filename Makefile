@@ -14,7 +14,9 @@ NAME		 =	philos
 
 SRCS = philo/main.c \
        philo/utils.c \
-       philo/init.c
+       philo/init.c  \
+	   philo/error_starter.c \
+	   philo/runner.c
 
 
 OBJS		=	$(SRCS:.c=.o)
@@ -34,15 +36,15 @@ $(NAME):	$(SRCS) $(OBJS) $(HD)
 
 leaks:
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all --suppressions=./readline.supp ./philo \
-	
 
-clean:		
+
+clean:
 			$(RM) philo/*.o
 
 fclean:		clean
 			$(RM) $(NAME)
 
-re:			fclean all 
+re:			fclean all
 
-			
+
 .PHONY:		all clean fclean re

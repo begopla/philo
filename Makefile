@@ -6,7 +6,7 @@
 #    By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/25 16:30:41 by bpla-rub          #+#    #+#              #
-#    Updated: 2023/05/09 13:28:45 by bpla-rub         ###   ########.fr        #
+#    Updated: 2023/05/18 12:17:42 by bpla-rub         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ SRCS = philo/main.c \
 OBJS		=	$(SRCS:.c=.o)
 HD			=	philo/philo.h
 CC			=	gcc
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror -pthread #-fsanitize=address
 #CFLAGS		=	-g -Wall -Wextra -Werror #-fsanitize=address
 RM			=	rm -rf
 

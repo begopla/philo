@@ -6,7 +6,7 @@
 /*   By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 11:49:27 by bpla-rub          #+#    #+#             */
-/*   Updated: 2023/05/09 14:00:34 by bpla-rub         ###   ########.fr       */
+/*   Updated: 2023/05/18 12:25:36 by bpla-rub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	ft_check_av(char **av)
 	int	j;
 
 	i = 1;
+	j = 0;
 	while (av[i])
 	{
 		j = 0;
@@ -57,18 +58,22 @@ int	ft_init_args(t_args *var, char **av)
 }
 
 static void	assign_data_each_philo(t_philo *philo, t_args *var,
-	pthread_mutex_t *mut, pthread_mutex_t *ptr_m)
+	pthread_mutex_t *mut, pthread_mutex_t *pr)
 {
 	int	i;
 
-	i = 1;
-	while (i <= var->num_philo)
+	i = 0;
+	while (i < var->num_philo)
 	{
 		philo[i].ate = 0;
-		philo[i].id = i;
+		philo[i].id = i + 1;
 		philo[i].mutex = mut;
-		philo[i].print = ptr_m;
+		philo[i].print = pr;
 		philo[i].info = var;
+		philo[i].m_ate = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+        pthread_mutex_init(philo[i].m_ate, NULL);
+		// philo[i].info->mt_eat = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+		// pthread_mutex_init(philo[i].info->mt_eat, NULL);
 		i++;
 	}
 }
@@ -82,12 +87,12 @@ int	init_philo(t_args *var, t_philo *philo)
 	i = 0;
 	mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * var->num_philo);
 	if (!mutex || !philo)
-		return (free_param(philo, mutex, var));
+		return (ft_free_struc(philo, mutex, var));
 	while (i < var->num_philo)
 		if (pthread_mutex_init(&mutex[i++], NULL))
-			return (free_param(philo, mutex, var));
+			return (ft_free_struc(philo, mutex, var));
 	if (pthread_mutex_init(&point_m, NULL))
-		return (free_param(philo, mutex, var));
+		return (ft_free_struc(philo, mutex, var));
 	assign_data_each_philo(philo, var, mutex, &point_m);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 12:11:10 by bpla-rub          #+#    #+#             */
-/*   Updated: 2023/05/09 13:50:54 by bpla-rub         ###   ########.fr       */
+/*   Updated: 2023/05/18 09:21:50 by bpla-rub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,22 +54,16 @@ void	destroy_mutex(t_philo *philo)
 	int	i;
 
 	i = 0;
-	while (philo->info->num_philo > i)
+	while (i < philo->info->num_philo)
 		pthread_mutex_destroy(&philo->mutex[i++]);
 }
 
 unsigned long	init_time(void)
 {
 	struct timeval	time;
-	unsigned long	total;
-	unsigned long	sec;
-	unsigned long	usec;
 
 	gettimeofday(&time, NULL);
-	sec = (time.tv_sec * 1000);
-	usec = (time.tv_usec * 1000);
-	total = sec + usec;
-	return (total);
+	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
 }
 
 unsigned long	return_time(t_philo *philo)

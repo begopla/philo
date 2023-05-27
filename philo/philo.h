@@ -6,7 +6,7 @@
 /*   By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 17:03:13 by bpla-rub          #+#    #+#             */
-/*   Updated: 2023/05/09 14:00:48 by bpla-rub         ###   ########.fr       */
+/*   Updated: 2023/05/18 12:04:02 by bpla-rub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ typedef struct s_args
 	int				time_sleep;
 	int				must_eat;
 	int				t_eat;
+	pthread_mutex_t	*mt_eat;
 	unsigned long	time;
 }	t_args;
 
@@ -38,6 +39,7 @@ typedef struct s_philo
 	t_args			*info;
 	pthread_mutex_t	*mutex;
 	pthread_mutex_t	*print;
+	pthread_mutex_t	*m_ate;
 	unsigned long	last_meal;
 }	t_philo;
 

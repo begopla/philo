@@ -6,57 +6,107 @@
 /*   By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 12:11:10 by bpla-rub          #+#    #+#             */
-/*   Updated: 2023/05/18 09:21:50 by bpla-rub         ###   ########.fr       */
+/*   Updated: 2023/05/29 17:07:45 by bpla-rub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	ft_atoi(const char *str)
+t_philo	*philo_get_data(t_data *d, int i)
 {
-	long int	n;
-	int			sign;
+	t_philo	*node;
 
-	n = 0;
-	sign = 1;
-	while ((*str <= 13 && *str >= 9) || *str == 32)
-		str++;
-	if (*str == '-')
-		return (-1);
-	else if (*str == '+')
-		str++;
-	while (*str)
+	node = malloc(sizeof(struct s_philo));
+	if (!node)
+		return (free_and_exit(NULL, NULL, THREAD_FAILED));
+	node->id = i + 1;
+	node->thread_id = 0;
+	pthread_mutex_init(&node->fork_lock, NULL);
+	pthread_mutex_init(&node->last_meal_lock, NULL);
+	node->data = d;
+	node->last_meal = 0;
+	return (node);
+}
+
+t_list	*philo_lst(t_data *d)
+{
+	int		i;
+	t_list	*philos;
+
+	i = -1;
+	philos = NULL;
+	while (++i < d->num_philo)
+		ft_lstadd_back(&philos, ft_lstnew(philo_get_data(d, i)));
+	return (philos);
+}
+
+int	print_error(char *param, t_philo_err err_code)
+{
+	printf("philo: ");
+	if (err_code == INV_ARGS)
+		printf("invalid number of arguments\n");
+	if (err_code == NO_MEMORY)
+		printf("no memory left on device\n");
+	if (err_code == THREAD_FAILED)
+		printf("failed to create a thread\n");
+	if (err_code == INV_NUM_PHILO)
+		printf("invalid philosopher_count: %s\n", param);
+	if (err_code == INV_DIE_TIME)
+		printf("invalid time_to_die: %s\n", param);
+	if (err_code == INV_EAT_TIME)
+		printf("invalid time_to_eat: %s\n", param);
+	if (err_code == INV_SLEEP_TIME)
+		printf("invalid time_to_sleep: %s\n", param);
+	if (err_code == INV_REPEAT_COUNT)
+		printf("invalid repeat_times: %s\n", param);
+	if (err_code == TOO_MANY_PHILO)
+		printf("not be able to handle that many philosophers: %s\n", param);
+	return (1);
+}
+
+void	philo_timestamp(t_list *philos, char *action, useconds_t t)
+{
+	useconds_t	time;
+	t_philo		*philo;
+	int			died;
+	int			eat_count;
+
+	philo = philos->content;
+	pthread_mutex_lock(&philo->data->died_lock);
+	died = philo->data->died;
+	pthread_mutex_lock(&philo->data->eat_count_lock);
+	eat_count = philo->data->eat_count;
+	time = get_time() - philo->data->init_time;
+	if (philo->data->repeat_count * philo->data->num_philo != \
+			eat_count && (!died || action[7] == 'd'))
 	{
-		if (*str >= '0' && *str <= '9')
-			n = n * 10 + (*str++ - '0');
-		else
-			return (-1);
+		printf("\033[1;39m%u\033  \033[1;34m%d  \033[0;39m%s\n", \
+			time, philo->id, action);
 	}
-	return ((int)(n * sign));
+	if (action[10] == 'e')
+		philo->data->eat_count++;
+	pthread_mutex_unlock(&philo->data->eat_count_lock);
+	pthread_mutex_unlock(&philo->data->died_lock);
+	if (philo->data->repeat_count * philo->data->num_philo != \
+			eat_count && (!died || action[7] == 'd'))
+		ft_usleep(t);
 }
 
-unsigned long	init_time(void)
+void	*free_and_exit(t_list *philos, char *param, t_philo_err err_code)
 {
-	struct timeval	time;
+	t_philo	*philo;
+	t_list	*temp;
 
-	gettimeofday(&time, NULL);
-	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
-}
-
-long long	time_diff(long long past, long long pres)
-{
-	return (pres - past);
-}
-
-void		action_print(t_args *args, int id, char *string)
-{
-	pthread_mutex_lock(&(args->writing));
-	if (!(args->died))
+	temp = philos;
+	if (err_code != END)
+		print_error(param, err_code);
+	while (philos)
 	{
-		printf("%lli ", init_time() - args->first_timestamp);
-		printf("%i ", id + 1);
-		printf("%s\n", string);
+		philo = philos->content;
+		if (philo->id == philo->data->num_philo)
+			philos->next = NULL;
+		philos = philos->next;
 	}
-	pthread_mutex_unlock(&(args->writing));
-	return ;
+	ft_lstclear(&temp, free);
+	return (NULL);
 }

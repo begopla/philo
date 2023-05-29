@@ -6,73 +6,83 @@
 /*   By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 17:03:13 by bpla-rub          #+#    #+#             */
-/*   Updated: 2023/05/18 12:04:02 by bpla-rub         ###   ########.fr       */
+/*   Updated: 2023/05/29 17:07:32 by bpla-rub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-# include <stdio.h>
+# include "libft/libft_tools.h"
 # include <pthread.h>
-# include <stdlib.h>
-# include <unistd.h>
 # include <string.h>
 # include <sys/time.h>
 
-struct s_args;
+//# define PHILO_EAT "\033[1;95mis eating\033[0;39m"
+# define PHILO_EAT "\033[1;32mis eating\033[0;39m"
+# define PHILO_SLEEP "\033[1;97mis sleeping\033[0;39m"
+# define PHILO_THINK "\033[1;95mis thinking\033[0;39m"
+# define PHILO_TAKE_FORK "\033[1;96mhas taken a fork\033[0;39m"
+# define PHILO_DIE "\033[1;91mdied\033[0;39m"
 
-typedef struct s_philo
+/* Enum to handle errors in philosophers */
+typedef enum e_philo_err
 {
-	int				id;
-	int				ate;
-	int				left_fork_id;
-	int				right_fork_id;
-	long long		last_meal;
-	pthread_t		thread_id;
-	struct s_args	*args;
-}	t_philo;
+	END = 1,
+	INV_ARGS = -1,
+	TOO_MANY_PHILO = -2,
+	INV_NUM_PHILO = -3,
+	INV_DIE_TIME = -4,
+	INV_EAT_TIME = -5,
+	INV_SLEEP_TIME = -6,
+	INV_REPEAT_COUNT = -7,
+	NO_MEMORY = -8,
+	THREAD_FAILED = -9
+}			t_philo_err;
 
-typedef struct s_args
+/* Struct to store all data */
+typedef struct s_philo_data
 {
 	int				num_philo;
-	int				time_die;
-	int				time_eat;
-	int				time_sleep;
-	int				nb_eat;
+	useconds_t		init_time;
+	long			repeat_count;
+	long long		die_time;
+	long long		eat_time;
+	long long		sleep_time;
+	long			eat_count;
+	pthread_mutex_t	eat_count_lock;
 	int				died;
-	int				all_eat;
-	long long		first_timestamp;
-	pthread_mutex_t	meal_check;
-	pthread_mutex_t	forks[200];
-	pthread_mutex_t	writing;
-	unsigned long	time;
-	t_philo			philosophers[200];
-}	t_args;
+	pthread_mutex_t	died_lock;
+}					t_data;
 
+/* Struct to handle info for every philosopher */
+typedef struct s_philo
+{
+	int					id;
+	pthread_t			thread_id;
+	pthread_mutex_t		fork_lock;
+	useconds_t			last_meal;
+	pthread_mutex_t		last_meal_lock;
+	struct s_philo_data	*data;
+}						t_philo;
 
-/*
-** ----- error_starter.c -----
-*/
+int			print_error(char *param, t_philo_err err_code);
 
-int						throw_error(int error);
-void					exit_launcher(t_args *args, t_philo *philos);
-void					smart_sleep(long long time, t_args *args);
-/*
-** ----- runner.c -----
-*/
-int						launcher(t_args *args);
-/*
-** ----- init.c -----
-*/
-int						ft_init_all(t_args *args, char **av);
+/* Prints error message and exits freeing everything */
+void		*free_and_exit(t_list *philos, char *param, t_philo_err err_code);
 
-/*
-** ----- utils.c -----
-*/
+/* Personal & more precise implementation of the usleep function */
+int			ft_usleep(useconds_t usec);
 
-int						ft_atoi(const char *str);
-unsigned long			init_time(void);
-long long				time_diff(long long past, long long pres);
-void					action_print(t_args *args, int id, char *string);
+/* Returns current time in miliseconds */
+useconds_t	get_time(void);
+
+/* Fills an array with the default info for every philosopher */
+t_list		*philo_lst(t_data *d);
+
+/* Creates threads for every philosopher */
+void		*philo_init(int num_philo, t_list *philos);
+
+/* Prints current state of a philosopher if applicable */
+void		philo_timestamp(t_list *philos, char *action, useconds_t t);
 #endif

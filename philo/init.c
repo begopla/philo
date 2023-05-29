@@ -6,68 +6,103 @@
 /*   By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 11:49:27 by bpla-rub          #+#    #+#             */
-/*   Updated: 2023/05/18 12:25:36 by bpla-rub         ###   ########.fr       */
+/*   Updated: 2023/05/29 17:07:29 by bpla-rub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	init_philo(t_args *args)
+void	philo_actions(t_list *node, t_philo *philo, t_philo *next)
 {
-	int	i;
-
-	i = args->num_philo;
-	while (--i >= 0)
-	{
-		args->philosophers[i].id = i;
-		args->philosophers[i].ate = 0;
-		args->philosophers[i].left_fork_id= i;
-		args->philosophers[i].right_fork_id = (i + 1) % args->num_philo;
-		args->philosophers[i].last_meal = 0;
-		args->philosophers[i].args = args;
-	}
-	return (0);
+	pthread_mutex_lock(&philo->fork_lock);
+	philo_timestamp(node, PHILO_TAKE_FORK, 0);
+	pthread_mutex_lock(&next->fork_lock);
+	philo_timestamp(node, PHILO_TAKE_FORK, 0);
+	pthread_mutex_lock(&philo->last_meal_lock);
+	philo->last_meal = get_time() - philo->data->init_time;
+	pthread_mutex_unlock(&philo->last_meal_lock);
+	philo_timestamp(node, PHILO_EAT, philo->data->eat_time);
+	philo_timestamp(node, PHILO_SLEEP, 0);
+	pthread_mutex_unlock(&next->fork_lock);
+	pthread_mutex_unlock(&philo->fork_lock);
+	ft_usleep(philo->data->sleep_time);
+	philo_timestamp(node, PHILO_THINK, 0);
 }
 
-int	init_mutex(t_args *args)
+void	*start_thread(void *node)
 {
-	int i;
+	t_philo		*philo;
+	t_philo		*next;
+	int			i;
 
-	i = args->num_philo;
-	while (--i >= 0)
+	i = -1;
+	philo = ((t_list *)node)->content;
+	next = ((t_list *)node)->next->content;
+	ft_usleep(!(philo->id % 2) * 2);
+	pthread_mutex_lock(&philo->data->died_lock);
+	while (philo->id != next->id && !philo->data->died && \
+		(philo->data->repeat_count == -2 || ++i < philo->data->repeat_count))
 	{
-		if (pthread_mutex_init(&(args->forks[i]), NULL))
-			return (1);
+		pthread_mutex_unlock(&philo->data->died_lock);
+		philo_actions(node, philo, next);
+		pthread_mutex_lock(&philo->data->died_lock);
 	}
-	if (pthread_mutex_init(&(args->writing), NULL))
-		return (1);
-	if (pthread_mutex_init(&(args->meal_check), NULL))
-		return (1);
-	return (0);
+	pthread_mutex_unlock(&philo->data->died_lock);
+	return (NULL);
 }
 
-
-int	ft_init_all(t_args *args, char **av)
+void	*philo_monitor(t_list *start, t_philo *philo)
 {
-	args->num_philo = ft_atoi(av[1]);
-	args->time_die = ft_atoi(av[2]);
-	args->time_eat = ft_atoi(av[3]);
-	args->time_sleep = ft_atoi(av[4]);
-	args->all_eat = 0;
-	args->died = 0;
-	if (args->num_philo <= 0 || args->time_die < 60
-		|| args->time_eat < 60 || args->time_sleep < 60 || args->num_philo > 200)
-		return (1);
-	if (av[5])
+	long	eat_c;
+	long	last_meal;
+
+	while (1)
 	{
-		args->nb_eat = ft_atoi(av[5]);
-		if (args->nb_eat <= 0)
-			return (1);
+		philo = start->content;
+		pthread_mutex_lock(&philo->data->eat_count_lock);
+		eat_c = philo->data->eat_count;
+		pthread_mutex_unlock(&philo->data->eat_count_lock);
+		pthread_mutex_lock(&philo->last_meal_lock);
+		last_meal = philo->last_meal;
+		pthread_mutex_unlock(&philo->last_meal_lock);
+		if (get_time() - philo->data->init_time - last_meal >= \
+			philo->data->die_time || eat_c == \
+			philo->data->num_philo * philo->data->repeat_count)
+		{
+			pthread_mutex_lock(&philo->data->died_lock);
+			philo->data->died = 1;
+			pthread_mutex_unlock(&philo->data->died_lock);
+			if (eat_c != philo->data->num_philo * philo->data->repeat_count)
+				philo_timestamp(start, PHILO_DIE, 0);
+			return (NULL);
+		}
+		start = start->next;
 	}
-	else
-		args->nb_eat = -1;
-	if (init_mutex(args))
-		return (2);
-	init_philo(args);
-	return (0);
+}
+
+void	*philo_init(int num_philo, t_list *philos)
+{
+	int		i;
+	t_list	*start;
+	t_philo	*philo;
+
+	i = -1;
+	start = philos;
+	while (++i < num_philo)
+	{
+		philo = start->content;
+		if (pthread_create(&philo->thread_id, NULL, start_thread, start))
+			return (free_and_exit(philos, NULL, THREAD_FAILED));
+		start = start->next;
+	}
+	philo_monitor(philos, NULL);
+	start = philos; // Reset start to the beginning of the list
+	i = -1;
+	while (++i < num_philo)
+	{
+		philo = start->content;
+		pthread_join(philo->thread_id, NULL);
+		start = start->next;
+	}
+	return (NULL);
 }

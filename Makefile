@@ -1,50 +1,41 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: bpla-rub <bpla-rub@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/04/25 16:30:41 by bpla-rub          #+#    #+#              #
-#    Updated: 2023/05/29 15:40:21 by bpla-rub         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+NAME = philo
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=address
+SRC =	main.c \
+		state.c \
+		thread.c \
+		utils.c \
 
-NAME		 =	philos
+VPATH = src
 
-SRCS = philo/main.c    \
-       philo/time.c    \
-       philo/utils.c   \
-       philo/init.c    \
-	   philo/libft/libft.c   \
+OBJDIR = .bin
+
+all: $(NAME)
+
+OBJ = $(addprefix $(OBJDIR)/, $(SRC:.c=.o))
 
 
-OBJS		=	$(SRCS:.c=.o)
-HD			=	philo/philo.h
-CC			=	gcc
-CFLAGS		=	-Wall -Wextra -Werror -pthread
-RM			=	rm -rf
+$(OBJDIR)/%.o: %.c | $(OBJDIR)
+	$(CC) -c $^ -o $@
 
-all:		$(NAME)
+$(OBJDIR):
+	mkdir .bin
 
-$(NAME):	$(SRCS) $(OBJS) $(HD)
-	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
+$(NAME): $(OBJ) include/philo.h
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
-%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+r: re
+	printf "\e[1;1H\e[2J";
+	./philo 5 800 200 200
 
-leaks:
-	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all --suppressions=./readline.supp ./philo \
-	
+clean:
+	rm -rf $(OBJDIR)
 
-clean:		
-			$(RM) philo/*.o
-			$(RM) philo/libft/*.o
+fclean:
+	make clean
+	rm -f $(NAME)
 
-fclean:		clean
-			$(RM) $(NAME)
+re: fclean all
 
-re:			fclean all 
-
-			
-.PHONY:		all clean fclean re
+.PHONY:
+	clean fclean re nice

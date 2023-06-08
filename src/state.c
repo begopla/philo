@@ -4,7 +4,11 @@ static void	*eat_state(t_philo *philo)
 {
 	pthread_mutex_lock(&(philo->g->print_mutex));
 	if (!someone_died(philo))
-		printf("%u %d is eating 🍝\n", get_time()- philo->g->init_time, philo->id);
+	{
+		printf("%u %d	",get_time()- philo->g->init_time, philo->id);
+		printf("\033[1;32mis eating\033[0;39m\n");
+
+	}
 	pthread_mutex_unlock(&(philo->g->print_mutex));
 	pthread_mutex_lock(&(philo->g->philo_mutex));
 	philo->last_meal = get_time();
@@ -20,7 +24,10 @@ static void	*sleep_state(t_philo *philo)
 {
 	pthread_mutex_lock(&(philo->g->print_mutex));
 	if (!someone_died(philo))
-		printf("%u %d is sleeping 💤\n", get_time()- philo->g->init_time, philo->id);
+	{
+		printf("%u %d	",get_time()- philo->g->init_time, philo->id);
+		printf("\033[1;97mis sleeping\033[0;39m\n");
+	}
 	pthread_mutex_unlock(&(philo->g->print_mutex));
 	usleep(philo->g->a.time_to_sleep);
 	return (NULL);
@@ -30,7 +37,10 @@ static void	*think_state(t_philo *philo)
 {
 	pthread_mutex_lock(&(philo->g->print_mutex));
 	if (!someone_died(philo))
-		printf("%u %d is thinking 🤔\n", get_time()- philo->g->init_time, philo->id);
+	{
+		printf("%u %d	",get_time()- philo->g->init_time, philo->id);
+		printf("\033[1;95mis thinking\033[0;39m\n");
+	}
 	pthread_mutex_unlock(&(philo->g->print_mutex));
 	return (NULL);
 }
@@ -41,7 +51,8 @@ static void	*dead_state(t_philo *philo, t_data *d)
 	d->died = true;
 	pthread_mutex_unlock(&(d->death_mutex));
 	pthread_mutex_lock(&((*philo).g->print_mutex));
-	printf("%u %d died 💀\n", get_time() - philo->g->init_time, (*philo).id);
+	printf("%u %d	",get_time()- philo->g->init_time, (*philo).id);
+	printf("\033[1;91mdied\033[0;39m 💀\n");
 	pthread_mutex_unlock(&((*philo).g->print_mutex));
 	return (NULL);
 }

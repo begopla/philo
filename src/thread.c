@@ -23,7 +23,10 @@ static void	take_fork(char which_fork, t_philo *philo)
 		*fork_state = UP;
 		pthread_mutex_lock(&(philo->g->print_mutex));
 		if (!someone_died(philo))
-			printf("%u %d has taken a fork 🍴\n", get_time() - philo->g->init_time, philo->id);
+		{
+			printf("%u %d	",get_time()- philo->g->init_time, philo->id);
+			printf("\033[1;96mhas taken a fork\033[0;39m\n");
+		}
 		pthread_mutex_unlock(&(philo->g->print_mutex));
 	}
 }
@@ -53,7 +56,7 @@ static void	*philosopher_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	if (philo->id % 2)
-		usleep(65000);
+		usleep(5000);
 	while (!someone_died(philo) && philo->loop != philo->g->a.repeat_count)
 	{
 		take_fork(LEFT_FORK, philo);

@@ -48,7 +48,7 @@ static void	*think_state(t_philo *philo)
 static void	*dead_state(t_philo *philo, t_data *d)
 {
 	pthread_mutex_lock(&(d->death_mutex));
-	d->died = true;
+	d->died = 1;
 	pthread_mutex_unlock(&(d->death_mutex));
 	pthread_mutex_lock(&((*philo).d->print_mutex));
 	printf("%u %d	",get_time()- philo->d->init_time, (*philo).id);

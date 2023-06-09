@@ -2,7 +2,7 @@
 
 static void	take_fork(char which_fork, t_philo *philo)
 {
-	bool	*fork_state;
+	int	*fork_state;
 	t_fork	*fork;
 
 	if (which_fork == LEFT_FORK)
@@ -33,7 +33,7 @@ static void	take_fork(char which_fork, t_philo *philo)
 
 static void	put_fork(char which_fork, t_philo *philo)
 {
-	bool	*fork_state;
+	int	*fork_state;
 	t_fork	*fork;
 
 	if (which_fork == LEFT_FORK)
@@ -103,7 +103,7 @@ static void	*supervisor_routine(t_data *d, t_philo **philos)
 	return (NULL);
 }
 
-bool	thread_handler(t_data *d, t_philo **philos)
+int	thread_handler(t_data *d, t_philo **philos)
 {
 	int	i;
 

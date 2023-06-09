@@ -1,6 +1,6 @@
 #include "../include/philo.h"
 
-static bool	philo_init(t_data *d, t_philo **philos, t_fork **forks)
+static int	philo_init(t_data *d, t_philo **philos, t_fork **forks)
 {
 	t_philo	*philo;
 	int		i;
@@ -29,20 +29,20 @@ static bool	philo_init(t_data *d, t_philo **philos, t_fork **forks)
 	return (1);
 }
 
-static bool	global_init(t_data *g, t_args a)
+static int	global_init(t_data *g, t_args a)
 {
 	g->a = a;
-	g->died = false;
+	g->died = 0;
 	if (pthread_mutex_init(&(g->philo_mutex), NULL))
-		return (false);
+		return (0);
 	if (pthread_mutex_init(&(g->death_mutex), NULL))
-		return (false);
+		return (0);
 	if (pthread_mutex_init(&(g->print_mutex), NULL))
-		return (false);
-	return (true);
+		return (0);
+	return (1);
 }
 
-static bool	args_init(t_args *a, int argc, char **argv)
+static int	args_init(t_args *a, int argc, char **argv)
 {
 	a->num_philo = get_input_value(argv[1]);
 	a->time_to_die = get_input_value(argv[2]) * 1000;
@@ -53,8 +53,8 @@ static bool	args_init(t_args *a, int argc, char **argv)
 		a->repeat_count = get_input_value(argv[5]);
 	if (a->num_philo == -1 || a->time_to_die == -1 || a->time_to_eat \
 		== -1 || a->time_to_sleep == -1 || a->repeat_count == -1)
-		return (false);
-	return (true);
+		return (0);
+	return (1);
 }
 
 int	main(int argc, char **argv)

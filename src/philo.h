@@ -61,8 +61,8 @@ typedef struct s_philo
 	time_t			last_meal;
 	t_fork			*right_fork;
 	t_fork			*left_fork;
-	int				right_fork_state;
-	int				left_fork_state;
+	int			right_fork_state;
+	int			left_fork_state;
 }	t_philo;
 
 // Functions ------------------------------------------------------------------>

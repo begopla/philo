@@ -10,7 +10,7 @@ useconds_t	get_time(void)
 
 int	someone_died(t_philo *philo)
 {
-	bool	state;
+	int	state;
 
 	pthread_mutex_lock(&(philo->d->death_mutex));
 	state = philo->d->died;

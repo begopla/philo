@@ -12,9 +12,7 @@ int	someone_died(t_philo *philo)
 {
 	int	state;
 
-	pthread_mutex_lock(&(
-
-		->d->death_mutex));
+	pthread_mutex_lock(&(philo->d->death_mutex));
 	state = philo->d->died;
 	pthread_mutex_unlock(&(philo->d->death_mutex));
 	return (state);
@@ -72,9 +70,11 @@ int	free_and_exit(t_data *d, t_philo *philo, t_fork *forks)
 {
 	if (d)
 	{
+		if (pthread_mutex_destroy(&d->philo_mutex))
+			return (1);
 		if (pthread_mutex_destroy(&d->death_mutex))
 			return (1);
-		if (pthread_mutex_destroy(&d->philo_mutex))
+		if (pthread_mutex_destroy(&d->print_mutex))
 			return (1);
 	}
 	if (philo)

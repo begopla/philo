@@ -29,7 +29,7 @@ static int	philo_init(t_data *d, t_philo **philos, t_fork **forks)
 	return (1);
 }
 
-static int	global_init(t_data *g, t_args a)
+static int	mutex_init(t_data *g, t_args a)
 {
 	g->a = a;
 	g->died = 0;
@@ -70,11 +70,11 @@ int	main(int argc, char **argv)
 			return (printf_error("Wrong type of args, only numbers allowed\n", NULL, NULL, NULL));
 	if (!args_init(&a, argc, argv))
 		return (printf_error("Invalid input\n", &d, NULL, NULL));
-	if (!global_init(&d, a))
+	if (!mutex_init(&d, a))
 		return (printf_error("Mutex init failure\n", &d, NULL, NULL));
 	if (!philo_init(&d, &philos, &forks))
 		return (printf_error("Malloc failure\n", &d, philos, forks));
 	if (!ft_create_thread(&d, &philos))
-		return (printf_error("Some errors with threads\n", &d, philos, forks));
+		return (printf_error("There were error in threads\n", &d, philos, forks));
 	return (free_and_exit(&d, philos, forks));
 }

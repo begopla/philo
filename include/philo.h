@@ -58,11 +58,12 @@ typedef struct s_philo
 
 int			printf_error(char *msg, t_data *d, t_philo *philo, t_fork *forks);
 int			free_and_exit(t_data *d, t_philo *philo, t_fork *forks);
-void		*state_handler(char state, t_philo *philo, t_data *d);
 int			someone_died(t_philo *philo);
 useconds_t	get_time(void);
 int			ft_create_thread(t_data *d, t_philo **philos);
 long long	get_num(char *str);
 int			ft_nonum(int n, char **str);
-
+void		print_state(t_philo *philo, char *str);
+void		eat_action(t_philo *philo);
+void		dead_action(t_philo *philo, t_data *d);
 #endif

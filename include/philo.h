@@ -66,4 +66,5 @@ int			ft_nonum(int n, char **str);
 void		print_state(t_philo *philo, char *str);
 void		eat_action(t_philo *philo);
 void		dead_action(t_philo *philo, t_data *d);
+void		put_fork(char which_fork, t_philo *philo);
 #endif

@@ -22,6 +22,7 @@ void	dead_action(t_philo *philo, t_data *d)
 	printf("\033[1;91mdied\033[0;39m 💀\n");
 	pthread_mutex_unlock(&((*philo).d->print_mutex));
 }
+
 void	print_state(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&(philo->d->print_mutex));
@@ -31,4 +32,23 @@ void	print_state(t_philo *philo, char *str)
 		printf("%s", str);
 	}
 	pthread_mutex_unlock(&(philo->d->print_mutex));
+}
+
+void	put_fork(char which_fork, t_philo *philo)
+{
+	int		*fork_state;
+	t_fork	*fork;
+
+	if (which_fork == LEFT_FORK)
+	{
+		fork_state = &(philo->right_fork_state);
+		fork = philo->right_fork;
+	}
+	else if (which_fork == RIGHT_FORK)
+	{
+		fork_state = &(philo->left_fork_state);
+		fork = philo->left_fork;
+	}
+	*fork_state = DOWN;
+	pthread_mutex_unlock(&(fork->fork_mutex));
 }

@@ -23,35 +23,15 @@ static void	take_fork(char which_fork, t_philo *philo)
 	}
 }
 
-
-static void	put_fork(char which_fork, t_philo *philo)
-{
-	int		*fork_state;
-	t_fork	*fork;
-
-	if (which_fork == LEFT_FORK)
-	{
-		fork_state = &(philo->right_fork_state);
-		fork = philo->right_fork;
-	}
-	else if (which_fork == RIGHT_FORK)
-	{
-		fork_state = &(philo->left_fork_state);
-		fork = philo->left_fork;
-	}
-	*fork_state = DOWN;
-	pthread_mutex_unlock(&(fork->fork_mutex));
-
-}
-
 static void	*do_actions(void *arg)
 {
 	t_philo	*philo;
+	int usleep_time;
+
 
 	philo = (t_philo *)arg;
 	if (philo->id % 2)
-		usleep(5000);
-	//usleep(!(philo->id % 2) * 5000);
+		usleep(1000);
 	while (!someone_died(philo) && philo->eat_count != philo->d->a.repeat_count)
 	{
 		take_fork(LEFT_FORK, philo);

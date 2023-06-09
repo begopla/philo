@@ -47,7 +47,6 @@ typedef struct t_data
 {
 	t_args			a;
 	bool			died;
-	pthread_t		t_supervisor;
 	useconds_t		init_time;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	death_mutex;
@@ -56,7 +55,7 @@ typedef struct t_data
 
 typedef struct s_philo
 {
-	t_data			*g;
+	t_data			*d;
 	unsigned char	id;
 	pthread_t		t_philosopher;
 	int				loop;

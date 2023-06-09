@@ -12,9 +12,9 @@ int	someone_died(t_philo *philo)
 {
 	bool	state;
 
-	pthread_mutex_lock(&(philo->g->death_mutex));
-	state = philo->g->died;
-	pthread_mutex_unlock(&(philo->g->death_mutex));
+	pthread_mutex_lock(&(philo->d->death_mutex));
+	state = philo->d->died;
+	pthread_mutex_unlock(&(philo->d->death_mutex));
 	return (state);
 }
 

@@ -1,32 +1,32 @@
 #include "../include/philo.h"
 
-static bool	philo_init(t_data *g, t_philo **philos, t_fork **forks)
+static bool	philo_init(t_data *d, t_philo **philos, t_fork **forks)
 {
 	t_philo	*philo;
 	int		i;
 
-	*philos = (t_philo *)malloc(sizeof(t_philo) * g->a.num_philo);
-	*forks = (t_fork *)malloc(sizeof(t_fork) * g->a.num_philo);
+	*philos = (t_philo *)malloc(sizeof(t_philo) * d->a.num_philo);
+	*forks = (t_fork *)malloc(sizeof(t_fork) * d->a.num_philo);
 	if (!philos || !forks)
-		return (false);
+		return (0);
 	i = -1;
-	while (++i < g->a.num_philo)
+	while (++i < d->a.num_philo)
 	{
 		philo = &(*philos)[i];
-		philo->g = g;
+		philo->d = d;
 		philo->id = i + 1;
-		philo->g->init_time = get_time();
+		philo->d->init_time = get_time();
 		philo->last_meal = get_time();
 		philo->loop = 0;
 		philo->right_fork = &((*forks)[i]);
 		philo->left_fork = &((*forks)[i + 1]);
-		if (philo->id == g->a.num_philo)
+		if (philo->id == d->a.num_philo)
 			philo->left_fork = &((*forks)[0]);
 		philo->right_fork_state = DOWN;
 		philo->left_fork_state = DOWN;
 		pthread_mutex_init(&(philo->left_fork->fork_mutex), NULL);
 	}
-	return (true);
+	return (1);
 }
 
 static bool	global_init(t_data *g, t_args a)

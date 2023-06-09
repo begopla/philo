@@ -12,59 +12,87 @@ int	someone_died(t_philo *philo)
 {
 	int	state;
 
-	pthread_mutex_lock(&(philo->d->death_mutex));
+	pthread_mutex_lock(&(
+
+		->d->death_mutex));
 	state = philo->d->died;
 	pthread_mutex_unlock(&(philo->d->death_mutex));
 	return (state);
 }
 
-int	get_input_value(char *s)
+int	ft_nonum(int n, char **str)
 {
-	int	n;
+	int		i;
+	int		j;
 
-	n = -1;
-	while (*s == 32)
-		s++;
-	if (*s == 45 || (*s != 43 && (*s < 48 || *s > 57)))
-		return (n);
-	if (*s == 43)
-		s++;
-	while (*s >= 48 && *s <= 57)
+	j = 1;
+	printf("total num of args %d\n", n);
+	while (n > 1)
 	{
-		if (n == -1)
-			n = 0;
-		n = n * 10 + *s - 48;
-		s++;
+		printf("arg: %s\n", str[j]);
+		i = 0;
+		while (str[j][i])
+		{
+			if ((str[j][i] >= '0' && str[j][i] <= '9'))
+				i++;
+			else
+				return (1);
+		}
+		j++;
+		n--;
 	}
-	return (n);
+	return (0);
 }
 
-int	clean_exit(t_data *d, t_philo *philo, t_fork *forks)
+
+long long	get_num(char *str)
+{
+	int				i;
+	int				sign;
+	long unsigned	number;
+
+	i = 0;
+	sign = 1;
+	number = 0;
+	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == 43 || str[i] == 45)
+	{
+		if (str[i] == 45)
+			sign = -1;
+		i++;
+	}
+	while (str[i] >= 48 && str[i] <= 57)
+	{
+		number = (number * 10) + str[i] - 48;
+		i++;
+	}
+	return (number * sign);
+}
+
+int	free_and_exit(t_data *d, t_philo *philo, t_fork *forks)
 {
 	if (d)
 	{
 		if (pthread_mutex_destroy(&d->death_mutex))
-			return (EXIT_FAILURE);
+			return (1);
 		if (pthread_mutex_destroy(&d->philo_mutex))
-			return (EXIT_FAILURE);
+			return (1);
 	}
 	if (philo)
 		free(philo);
 	if (forks)
 	{
 		if (pthread_mutex_destroy(&forks->fork_mutex))
-			return (EXIT_FAILURE);
+			return (1);
 		free(forks);
 	}
-	return (EXIT_SUCCESS);
+	return (0);
 }
 
-int	error_handler(char *msg, t_data *d, t_philo *philo, t_fork *forks)
+int	printf_error(char *msg, t_data *d, t_philo *philo, t_fork *forks)
 {
-	write(2, RED_BOLD, 7);
-	while (*msg)
-		write(2, &*msg++, 1);
-	write(2, RESET, 4);
-	clean_exit(d, philo, forks);
-	return (EXIT_FAILURE);
+	printf("\033[1;31mError: %s\033[0;39m\n",msg);
+	free_and_exit(d, philo, forks);
+	return (1);
 }

@@ -13,9 +13,9 @@ static void	*eat_state(t_philo *philo)
 	pthread_mutex_lock(&(philo->d->philo_mutex));
 	philo->last_meal = get_time();
 	pthread_mutex_unlock(&(philo->d->philo_mutex));
-	usleep(philo->d->a.time_to_eat);
+	usleep(philo->d->a.eat_time);
 	pthread_mutex_lock(&(philo->d->philo_mutex));
-	philo->loop++;
+	philo->eat_count++;
 	pthread_mutex_unlock(&(philo->d->philo_mutex));
 	return (NULL);
 }
@@ -29,7 +29,7 @@ static void	*sleep_state(t_philo *philo)
 		printf("\033[1;97mis sleeping\033[0;39m\n");
 	}
 	pthread_mutex_unlock(&(philo->d->print_mutex));
-	usleep(philo->d->a.time_to_sleep);
+	usleep(philo->d->a.sleep_time);
 	return (NULL);
 }
 

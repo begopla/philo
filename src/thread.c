@@ -57,7 +57,7 @@ static void	*philosopher_routine(void *arg)
 	philo = (t_philo *)arg;
 	if (philo->id % 2)
 		usleep(5000);
-	while (!someone_died(philo) && philo->loop != philo->d->a.repeat_count)
+	while (!someone_died(philo) && philo->eat_count != philo->d->a.repeat_count)
 	{
 		take_fork(LEFT_FORK, philo);
 		if (philo->left_fork_state == UP && philo->d->a.num_philo > 1)
@@ -88,12 +88,12 @@ static void	*supervisor_routine(t_data *d, t_philo **philos)
 		if (++i == d->a.num_philo)
 			i = 0;
 		pthread_mutex_lock(&(d->philo_mutex));
-		if ((*philos)[i].loop == d->a.repeat_count)
+		if ((*philos)[i].eat_count == d->a.repeat_count)
 		{
 			pthread_mutex_unlock(&(d->philo_mutex));
 			return (NULL);
 		}
-		if (get_time() - (*philos)[i].last_meal > d->a.time_to_die / 1000)
+		if ((get_time() - (*philos)[i].last_meal) > d->a.die_time / 1000)
 		{
 			pthread_mutex_unlock(&(d->philo_mutex));
 			return (state_handler(DEAD, &((*philos)[i]), d));
@@ -103,7 +103,7 @@ static void	*supervisor_routine(t_data *d, t_philo **philos)
 	return (NULL);
 }
 
-int	thread_handler(t_data *d, t_philo **philos)
+int	ft_create_thread(t_data *d, t_philo **philos)
 {
 	int	i;
 

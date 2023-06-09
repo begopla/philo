@@ -26,10 +26,8 @@ int	ft_nonum(int n, char **str)
 	int		j;
 
 	j = 1;
-	printf("total num of args %d\n", n);
 	while (n > 1)
 	{
-		printf("arg: %s\n", str[j]);
 		i = 0;
 		while (str[j][i])
 		{

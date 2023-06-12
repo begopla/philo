@@ -28,16 +28,14 @@ static void	*do_actions(void *arg)
 	t_philo	*philo;
 	int usleep_time;
 
-
 	philo = (t_philo *)arg;
-	if (philo->id % 2)
-		usleep(1000);
+	usleep(!(philo->id % 2) * 1000);
 	while (!someone_died(philo) && philo->eat_count != philo->d->a.repeat_count)
 	{
-		take_fork(LEFT_FORK, philo);
-		if (philo->left_fork_state == UP && philo->d->a.num_philo > 1)
-			take_fork(RIGHT_FORK, philo);
-		if (philo->left_fork_state == UP && philo->right_fork_state == UP)
+		take_fork(RIGHT_FORK, philo);
+		if (philo->right_fork_state == UP && philo->d->a.num_philo > 1)
+			take_fork(LEFT_FORK, philo);
+		if (philo->right_fork_state == UP && philo->left_fork_state == UP)
 		{
 			eat_action(philo);
 			put_fork(RIGHT_FORK, philo);

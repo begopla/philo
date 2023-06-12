@@ -8,11 +8,6 @@
 # include <pthread.h>
 # include <sys/time.h>
 
-# define THINK		0
-# define EAT		1
-# define SLEEP		2
-# define DEAD		3
-
 # define UP			1
 # define DOWN		0
 

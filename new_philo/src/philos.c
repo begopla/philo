@@ -1,7 +1,7 @@
 
 #include "../include/philo.h"
 
-static void	_philos_init(t_data *data, t_philo *first)
+static void	ft_philos_init(t_data *data, t_philo *first)
 {
 	t_philo	*philo;
 	size_t	i;
@@ -30,7 +30,7 @@ static void	_philos_init(t_data *data, t_philo *first)
 	}
 }
 
-static void	_make_ends_meet(t_philo *philo, t_philo *first)
+static void	ft_make_ends_meet(t_philo *philo, t_philo *first)
 {
 	philo->next = first;
 	first->prev = philo;
@@ -42,27 +42,38 @@ t_philo	*generate_philos(t_data *data, int nb)
 	t_philo	*first;
 	int		i;
 
-	first = malloc(sizeof(t_philo));
-	if (!first)
-		return (ft_putstr_fd(ERRALLOC, 2), NULL);
-	philo = first;
-	i = 0;
-	while (1)
+
+    first = malloc(sizeof(t_philo));
+    if (!first) {
+        printf("%s", ERRTYPE); // Print the error message using printf
+        return NULL;
+    }
+    philo = first;
+    i = 0;
+    while (1)
 	{
 		philo->next = NULL;
 		philo->left_fork.mutex = malloc(sizeof(pthread_mutex_t));
-		if (!(philo->left_fork.mutex))
-			return (free_philos(first, 0), ft_putstr_fd(ERRALLOC, 2), NULL);
+		if (!(philo->left_fork.mutex)) {
+			printf("%s", ERRTYPE);
+			free_philos(first, 0);
+			return NULL;
+		}
 		if (++i >= nb)
-			break ;
+			break;
 		philo->next = malloc(sizeof(t_philo));
 		if (!(philo->next))
-			return (free_philos(first, 0), ft_putstr_fd(ERRALLOC, 2), NULL);
+		{
+			printf("%s", ERRTYPE);
+			free_philos(first, 0);
+			return NULL;
+		}
 		philo->next->prev = philo;
 		philo = philo->next;
 	}
-	_make_ends_meet(philo, first);
-	return (_philos_init(data, first), first);
+	ft_make_ends_meet(philo, first);
+	ft_philos_init(data, first);
+	return first;
 }
 
 void	free_philos(t_philo *first, int initialized)

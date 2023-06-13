@@ -22,20 +22,20 @@ static int	_check_mutexes(t_data *data)
 {
 	if (pthread_mutex_init(&(data->print_mutex), NULL) != 0)
 	{
-		ft_putstr_fd(ERRALLOC, 2);
+		printf("%s", ERRTYPE);
 		free(data);
 		return (0);
 	}
 	else if (pthread_mutex_init(&(data->eat_mutex), NULL) != 0)
 	{
-		ft_putstr_fd(ERRALLOC, 2);
+		printf("%s", ERRTYPE);
 		pthread_mutex_destroy(&(data->print_mutex));
 		free(data);
 		return (0);
 	}
 	else if (pthread_mutex_init(&(data->end_mutex), NULL) != 0)
 	{
-		ft_putstr_fd(ERRALLOC, 2);
+		printf("%s", ERRTYPE);
 		pthread_mutex_destroy(&(data->print_mutex));
 		pthread_mutex_destroy(&(data->eat_mutex));
 		free(data);
@@ -51,7 +51,7 @@ t_data	*define_data(char **av, int ac)
 
 	data = malloc(sizeof(t_data));
 	if (!data)
-		return (ft_putstr_fd(ERRALLOC, 2), NULL);
+		return (printf("%s", ERRTYPE), NULL);
 	data->end = 0;
 	data->number_of_philosophers = get_num(av[1]);
 	data->time_to_die = get_num(av[2]);
@@ -63,7 +63,7 @@ t_data	*define_data(char **av, int ac)
 	else
 		data->must_eat = -1;
 	if (!ft_check_data(data, ac))
-		return (free(data), ft_putstr_fd(ERRARGS, 2), NULL);
+		return (free(data),printf("%s", ERRTYPE), NULL);
 	if (!_check_mutexes(data))
 		return (NULL);
 	return (data);

@@ -6,7 +6,10 @@ pthread_t	*allocate_threads(int number_of_philosophers)
 
 	threads = malloc(sizeof(pthread_t) * number_of_philosophers);
 	if (!threads)
-		return (ft_putstr_fd(ERRALLOC, 2), NULL);
+	{
+		printf("%s", ERRTYPE);
+		return (NULL);
+	}
 	return (threads);
 }
 

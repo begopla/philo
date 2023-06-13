@@ -64,18 +64,18 @@ typedef struct s_philo
 # define ERRNBR		4815162342
 
 # define ERRARGS	"\
-usage: ./philo number_of_philosophers time_to_die \
+Usage:  number_of_philosophers time_to_die \
 time_to_eat time_to_sleep \
 [number_of_times_each_philosopher_must_eat]\n"
 
-# define ERRALLOC	"philo: could not allocate memory.\n"
+# define ERRTYPE	"Error: Wrong argument type or \
+could not allocate.\n"
 
-/* Time functions */
 
 int				init_time(t_data *data);
 long long		get_time(void);
 void			ft_sleep(unsigned long long sleep, t_data *data);
-
+long long		get_num(const char *str);
 
 /* Philosophers functions */
 
@@ -113,10 +113,6 @@ int				create_threads(t_data *data, t_philo *philo, \
 
 int				join_threads(t_data *data, pthread_t *threads);
 
-/* Utility functions */
 
-long long	get_num(const char *str);
-
-size_t			ft_putstr_fd(const char *str, int fd);
 
 #endif

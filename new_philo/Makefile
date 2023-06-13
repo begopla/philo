@@ -5,13 +5,11 @@ SRC =	main.c \
 		actions.c \
 		utils.c \
 		check_death.c \
-		ft_putstr_fd.c \
 		philos.c \
 		print_state.c \
-		properties.c \
+		data.c \
 		routine.c \
 		threads.c \
-		time.c \
 
 VPATH = src
 

@@ -65,7 +65,10 @@ int	philo(int argc, char **argv)
 int	main(int argc, char **argv)
 {
 	if (argc < 5 || argc > 6)
-		return (ft_putstr_fd(ERRARGS, 2), 1);
+	{
+		printf("%s", ERRARGS);
+		return (1);
+	}
 	else
 		return (philo(argc, argv));
 }
